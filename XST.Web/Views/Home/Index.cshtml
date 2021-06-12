@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">XST</h1>
+    <p>Demo for calculating working days between two dates with some holiday configuration.</p>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            Start Date: <input type="date" class="form-control" id="start-date">
+        </div>
+        <div class="col-md-6">
+            End Date: <input type="date" class="form-control" id="end-date">
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-12">
+            <button onclick="calculateWorkingDays()" class="btn btn-primary w-100">Submit</button>
+        </div>
+    </div>
+</div>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-md-12">
+            <h5 id="answer">0 working day(s)</h5>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    function calculateWorkingDays() {
+        let answer = 0;
+        let start_date = $("#start-date").val();
+        let end_date = $("#end-date").val();
+
+        $.ajax({
+            url: "https://localhost:44361/CalculateWorkingDays",
+            type: "POST",
+            data: JSON.stringify({ startDt: start_date, endDt: end_date }),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (result) {
+                console.log(result);
+                answer = result;
+                $("#answer").text(`${result} working day(s)`);
+            },
+            error: function () {
+                alert("Error");
+            }
+        });
+    }
+</script>
