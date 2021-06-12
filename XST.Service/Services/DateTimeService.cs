@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XST.Service.Interfaces;
+using XST.Service.Utils.Enums;
 
 namespace XST.Service.Services
 {
@@ -55,6 +56,35 @@ namespace XST.Service.Services
                     && !(holiday.DayOfWeek == DayOfWeek.Sunday || holiday.DayOfWeek == DayOfWeek.Saturday))
                     workingDays--;
             }
+
+            return workingDays;
+        }
+
+        public int CalculateWorkingDays(DateTime startDate, DateTime endDate, Dictionary<IEnumerable<DateTime>, HolidayType> holidays)
+        {
+            int workingDays = CalculateWorkingDays(startDate, endDate);
+
+            foreach (var item in holidays)
+            {
+                switch (item.Value)
+                {
+                    case HolidayType.AlwaysOnSameDayEvenWeekend:
+                    case HolidayType.CertainDayInMonth:
+                        workingDays = CalculateWorkingDays(startDate, endDate, item.Key);
+                        break;
+                    case HolidayType.OnSameDayIfNotWeekend:
+                        for (int iterator = 0; iterator < item.Key.Count(); iterator++)
+                        {
+                            DateTime holiday = item.Key.ElementAt(iterator).Date;
+                            if (startDate.Date < holiday && endDate > holiday)
+                                workingDays--;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
 
             return workingDays;
         }
